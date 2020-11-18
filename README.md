@@ -1,2 +1,3 @@
-# wad-api-labs-2020
-A repo for web app development API labs
+# Web App Dev 2: Web API Labs
+
+Practical labs for the WAD2 module, BSc. Applied/Software Systems Dev/Forensics  
