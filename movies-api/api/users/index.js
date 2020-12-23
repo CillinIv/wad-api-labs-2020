@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 
 const router = express.Router(); // eslint-disable-line
 
+let reg = new RegExp('^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$');
+
 // Get all users
 router.get('/', (req, res,next) => {
     User.find().then(users =>  res.status(200).json(users)).catch(next);
@@ -19,6 +21,16 @@ router.post('/', async (req, res, next) => {
   }
   if (req.query.action === 'register') {
     await User.create(req.body).catch(next);
+
+    if(reg.test(req.body.password)){
+
+      res.status(401).json({
+        success: false,
+        msg: 'Please pass a valid password.',
+      });
+      
+    }
+
     res.status(201).json({
       code: 201,
       msg: 'Successful created new user.',
@@ -58,13 +70,20 @@ router.put('/:id',  (req, res) => {
 
 //Add a favourite. No Error Handling Yet. Can add duplicates too!
 router.post('/:userName/favourites', async (req, res, next) => {
-  const newFavourite = req.body.id;
   const userName = req.params.userName;
+  const newFavourite = req.body.id;
   const movie = await movieModel.findByMovieDBId(newFavourite);
+
+  const movie2 = await user.favourites.findByMovieDBId(newFavourite);
+
+  if(movie2 != movie){
+    await user.favourites.push(movie._id);
+  }
+
   const user = await User.findByUserName(userName);
-  await user.favourites.push(movie._id);
+  
   await user.save(); 
-  res.status(201).json(user); 
+  res.status(201).json(user).catch(next);
 });
   
 router.get('/:userName/favourites', (req, res, next) => {
