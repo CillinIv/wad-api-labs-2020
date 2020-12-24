@@ -4,8 +4,6 @@ import jwt from 'jsonwebtoken';
 
 const router = express.Router(); // eslint-disable-line
 
-let reg = new RegExp('^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$');
-
 // Get all users
 router.get('/', (req, res,next) => {
     User.find().then(users =>  res.status(200).json(users)).catch(next);
@@ -19,22 +17,26 @@ router.post('/', async (req, res, next) => {
       msg: 'Please pass username and password.',
     });
   }
+
+  
   if (req.query.action === 'register') {
-    await User.create(req.body).catch(next);
 
-    if(reg.test(req.body.password)){
+    if(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/.test(req.body.password)){
 
+      await User.create(req.body).catch(next);
+
+      res.status(201).json({
+        code: 201,
+        msg: 'Successful created new user.',
+      });
+
+    }else{
       res.status(401).json({
         success: false,
         msg: 'Please pass a valid password.',
       });
-      
     }
-
-    res.status(201).json({
-      code: 201,
-      msg: 'Successful created new user.',
-    });
+ 
   } else {
     const user = await User.findByUserName(req.body.username).catch(next);
       if (!user) return res.status(401).json({ code: 401, msg: 'Authentication failed. User not found.' });
