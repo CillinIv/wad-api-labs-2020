@@ -18,7 +18,6 @@ router.post('/', async (req, res, next) => {
     });
   }
 
-  
   if (req.query.action === 'register') {
 
     if(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/.test(req.body.password)){
@@ -35,7 +34,7 @@ router.post('/', async (req, res, next) => {
         success: false,
         msg: 'Please pass a valid password.',
       });
-    }
+   }
  
   } else {
     const user = await User.findByUserName(req.body.username).catch(next);
